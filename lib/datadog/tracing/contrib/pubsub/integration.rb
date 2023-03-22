@@ -5,7 +5,7 @@ require_relative 'patcher'
 module Datadog
   module Tracing
     module Contrib
-      module PubSub
+      module Pubsub
         # Description of PubSub integration
         class Integration
           include Contrib::Integration

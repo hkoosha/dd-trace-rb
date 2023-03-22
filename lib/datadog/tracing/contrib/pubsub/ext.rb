@@ -1,7 +1,7 @@
 module Datadog
   module Tracing
     module Contrib
-      module PubSub
+      module Pubsub
         # PubSub integration constants
         # @public_api Changing resource names, tag names, or environment variables creates breaking changes.
         module Ext

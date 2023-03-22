@@ -4,7 +4,7 @@ require_relative 'ext'
 module Datadog
   module Tracing
     module Contrib
-      module PubSub
+      module Pubsub
         # Patcher enables patching of 'pubsub' module.
         module Patcher
           include Contrib::Patcher

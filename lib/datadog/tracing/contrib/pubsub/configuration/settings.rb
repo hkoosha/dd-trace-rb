@@ -4,7 +4,7 @@ require_relative '../ext'
 module Datadog
   module Tracing
     module Contrib
-      module PubSub
+      module Pubsub
         module Configuration
           # Custom settings for the PubSub integration
           # @public_api

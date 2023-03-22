@@ -4,7 +4,7 @@ require_relative 'ext'
 module Datadog
   module Tracing
     module Contrib
-      module PubSub
+      module Pubsub
         # Instrumentation for PubSub integration
         module Instrumentation
           # Instrumentation for Google::Cloud::PubSub::Topic
