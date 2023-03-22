@@ -1,0 +1,83 @@
+require_relative '../../metadata/ext'
+require_relative 'ext'
+
+module Datadog
+  module Tracing
+    module Contrib
+      module PubSub
+        # Instrumentation for PubSub integration
+        module Instrumentation
+          # Instrumentation for Google::Cloud::PubSub::Topic
+          module Publisher
+            def self.included(base)
+              base.prepend(InstanceMethods)
+            end
+
+            # Instance methods for PubSub::Topic
+            module InstanceMethods
+              def publish(data = nil, attributes = nil, ordering_key: nil, compress: nil, compression_bytes_threshold: nil,
+                          **extra_attrs, &block)
+                Tracing.trace(
+                  Ext::SPAN_SEND_MESSAGES,
+                  service: datadog_configuration[:service_name]
+                ) do |span|
+                  attributes = decorate!(span, attributes)
+
+                  super(data, attributes, ordering_key: ordering_key, compress: compress, compression_bytes_threshold: compression_bytes_threshold,
+                        **extra_attrs, &block)
+                end
+              end
+
+              private
+
+              @@dd = ::Datadog::Tracing::Distributed::Datadog.new(fetcher: ::Datadog::Tracing::Distributed::Fetcher)
+
+              def datadog_configuration
+                Datadog.configuration.tracing[:pubsub]
+              end
+
+              def decorate!(span, attributes)
+                span.set_tag(Tracing::Metadata::Ext::TAG_COMPONENT, Ext::TAG_COMPONENT)
+                span.set_tag(Tracing::Metadata::Ext::TAG_KIND, Tracing::Metadata::Ext::SpanKind::TAG_PRODUCER)
+
+                # Set analytics sample rate
+                if Contrib::Analytics.enabled?(datadog_configuration[:analytics_enabled])
+                  Contrib::Analytics.set_sample_rate(span, datadog_configuration[:analytics_sample_rate])
+                end
+
+                attributes = {} if attributes.nil?
+                @dd.inject!(::Datadog::Tracing::active_trace&.to_digest, attributes)
+                attributes
+              end
+            end
+          end
+
+          module Consumer
+            def self.included(base)
+              base.prepend(InstanceMethods)
+            end
+
+            # Instance methods for PubSub::Topic
+            module InstanceMethods
+              def listen(deadline: nil, message_ordering: nil, streams: nil, inventory: nil, threads: {}, &block)
+                super.listen(deadline: deadline, message_ordering: message_ordering, streams: streams, inventory: inventory, threads: threads) do |msg|
+                  continue_trace msg
+                  yield msg
+                end
+              end
+
+              private
+
+              @@dd = ::Datadog::Tracing::Distributed::Datadog.new(fetcher: ::Datadog::Tracing::Distributed::Fetcher)
+
+              def continue_trace(msg)
+                digest = @@dd.extract(msg.attributes)
+                ::DataDog::Tracing.continue_trace!(digest)
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+end
