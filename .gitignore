@@ -51,3 +51,6 @@ gemfiles/.bundle
 # Native extension binaries
 lib/*.bundle
 lib/*.so
+
+/.idea/
+/.tool-versions
