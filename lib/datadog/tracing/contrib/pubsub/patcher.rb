@@ -30,7 +30,7 @@ module Datadog
                 Datadog.logger.error('Patching Pubsub consumer')
                 ::Google::Cloud::PubSub::Subscription.include(Instrumentation::Consumer)
               rescue StandardError => e
-                Datadog.logger.error("Unable to apply Presto integration: #{e}")
+                Datadog.logger.error("Unable to apply PubSub integration: #{e}")
               end
             end
           end
