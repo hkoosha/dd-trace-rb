@@ -64,6 +64,7 @@ module Datadog
                   continue_trace msg
                   yield msg
                 end
+                Datadog.logger.error("methods: #{super} :: #{super.methods.sort}")
                 super.listen(deadline: deadline, message_ordering: message_ordering, streams: streams, inventory: inventory, threads: threads, &traced_block)
               end
 
