@@ -66,7 +66,6 @@ module Datadog
                   yield msg
                 end
 
-                Datadog.logger.error("super: #{super.class.name}")
                 super(deadline: deadline, message_ordering: message_ordering, streams: streams, inventory: inventory, threads: threads, &traced_block)
               end
 
