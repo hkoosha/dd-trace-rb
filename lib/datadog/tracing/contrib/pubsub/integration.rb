@@ -22,10 +22,10 @@ module Datadog
           end
 
           def self.loaded?
+            require 'google/cloud/pubusb'
             v = !defined?(::Google::Cloud::PubSub).nil?
             Datadog.logger.error("PubSub Loaded: #{v}")
             v
-            true
           end
 
           def self.compatible?
