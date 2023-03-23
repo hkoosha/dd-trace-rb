@@ -61,21 +61,18 @@ module Datadog
             module InstanceMethods
               def listen(deadline: nil, message_ordering: nil, streams: nil, inventory: nil, threads: {}, &block)
                 traced_block = proc do |msg|
-                  continue_trace msg
+                  digest = DD.extract(msg.attributes)
+                  ::DataDog::Tracing.continue_trace!(digest)
                   yield msg
                 end
-                Datadog.logger.error("methods: #{super} :: #{super.methods.sort}")
+
+                Datadog.logger.error("super: #{super.class.name}")
                 super.listen(deadline: deadline, message_ordering: message_ordering, streams: streams, inventory: inventory, threads: threads, &traced_block)
               end
 
               private
 
               DD = ::Datadog::Tracing::Distributed::Datadog.new(fetcher: ::Datadog::Tracing::Distributed::Fetcher)
-
-              def continue_trace(msg)
-                digest = DD.extract(msg.attributes)
-                ::DataDog::Tracing.continue_trace!(digest)
-              end
             end
           end
         end
