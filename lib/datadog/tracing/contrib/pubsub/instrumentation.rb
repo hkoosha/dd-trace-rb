@@ -17,6 +17,7 @@ module Datadog
             module InstanceMethods
               def publish(data = nil, attributes = nil, ordering_key: nil, compress: nil, compression_bytes_threshold: nil,
                           **extra_attrs, &block)
+                Datadog.logger.error('PubSub publish')
                 Tracing.trace(
                   Ext::SPAN_SEND_MESSAGES,
                   service: datadog_configuration[:service_name]
@@ -60,7 +61,9 @@ module Datadog
             # Instance methods for PubSub::Topic
             module InstanceMethods
               def listen(deadline: nil, message_ordering: nil, streams: nil, inventory: nil, threads: {}, &block)
+                Datadog.logger.error('PubSub listen')
                 super.listen(deadline: deadline, message_ordering: message_ordering, streams: streams, inventory: inventory, threads: threads) do |msg|
+                  Datadog.logger.error('PubSub listen block')
                   continue_trace msg
                   yield msg
                 end

@@ -1,5 +1,6 @@
 require_relative '../patcher'
 require_relative 'ext'
+require_relative 'instrumentation'
 
 module Datadog
   module Tracing
@@ -24,7 +25,10 @@ module Datadog
           def patch
             PATCH_ONLY_ONCE.run do
               begin
+                Datadog.logger.error('Patching Pubsub publisher')
                 ::Google::Cloud::PubSub::Topic.include(Instrumentation::Publisher)
+                Datadog.logger.error('Patching Pubsub consumer')
+                ::Google::Cloud::PubSub::Subscription.include(Instrumentation::Consumer)
               rescue StandardError => e
                 Datadog.logger.error("Unable to apply Presto integration: #{e}")
               end
