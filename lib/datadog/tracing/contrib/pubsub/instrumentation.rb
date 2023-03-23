@@ -37,7 +37,7 @@ module Datadog
               end
 
               def decorate!(span, attributes)
-                span.set_tag(Tracing::Metadata::Ext::TAG_COMPONENT, Ext::TAG_COMPONENT)
+                span.set_tag(Tracing::Metadata::Ext::TAG_COMPONENT, Ext::TAG_MESSAGING_SYSTEM)
                 span.set_tag(Tracing::Metadata::Ext::TAG_KIND, Tracing::Metadata::Ext::SpanKind::TAG_PRODUCER)
 
                 # Set analytics sample rate
