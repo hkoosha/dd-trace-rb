@@ -70,6 +70,10 @@ module Datadog
                 super.listen(deadline: deadline, message_ordering: message_ordering, streams: streams, inventory: inventory, threads: threads, &traced_block)
               end
 
+              def passthrough(deadline: nil, message_ordering: nil, streams: nil, inventory: nil, threads: {}, &block)
+                super.listen(deadline: deadline, message_ordering: message_ordering, streams: streams, inventory: inventory, threads: threads, &block)
+              end
+
               private
 
               DD = ::Datadog::Tracing::Distributed::Datadog.new(fetcher: ::Datadog::Tracing::Distributed::Fetcher)
