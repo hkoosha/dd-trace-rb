@@ -25,6 +25,7 @@ module Datadog
             v = !defined?(::Google::Cloud::PubSub).nil?
             Datadog.logger.error("PubSub Loaded: #{v}")
             v
+            true
           end
 
           def self.compatible?
