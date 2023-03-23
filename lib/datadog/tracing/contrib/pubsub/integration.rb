@@ -13,7 +13,7 @@ module Datadog
           MINIMUM_VERSION = Gem::Version.new('2.14.0')
 
           # @public_api Changing the integration name or integration options can cause breaking changes
-          register_as :pubsub, auto_patch: true
+          register_as :pubsub
 
           def self.version
             v = Gem.loaded_specs['google-cloud-pubsub'] && Gem.loaded_specs['google-cloud-pubsub'].version
