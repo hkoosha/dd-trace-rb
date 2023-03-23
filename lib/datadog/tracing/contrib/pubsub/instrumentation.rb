@@ -62,7 +62,7 @@ module Datadog
               def listen(deadline: nil, message_ordering: nil, streams: nil, inventory: nil, threads: {}, &block)
                 traced_block = proc do |msg|
                   digest = DD.extract(msg.attributes)
-                  ::DataDog::Tracing.continue_trace!(digest)
+                  ::Datadog::Tracing.continue_trace!(digest)
                   yield msg
                 end
 
