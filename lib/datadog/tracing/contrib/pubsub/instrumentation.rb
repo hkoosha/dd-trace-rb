@@ -60,10 +60,11 @@ module Datadog
             # Instance methods for PubSub::Topic
             module InstanceMethods
               def listen(deadline: nil, message_ordering: nil, streams: nil, inventory: nil, threads: {}, &block)
-                super.listen(deadline: deadline, message_ordering: message_ordering, streams: streams, inventory: inventory, threads: threads) do |msg|
+                traced_block = proc do |msg|
                   continue_trace msg
                   yield msg
                 end
+                super.listen(deadline: deadline, message_ordering: message_ordering, streams: streams, inventory: inventory, threads: threads, &traced_block)
               end
 
               private
