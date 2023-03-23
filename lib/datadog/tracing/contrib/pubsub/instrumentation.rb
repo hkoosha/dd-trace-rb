@@ -67,11 +67,11 @@ module Datadog
                 end
 
                 Datadog.logger.error("super: #{super.class.name}")
-                super.listen(deadline: deadline, message_ordering: message_ordering, streams: streams, inventory: inventory, threads: threads, &traced_block)
+                super(deadline: deadline, message_ordering: message_ordering, streams: streams, inventory: inventory, threads: threads, &traced_block)
               end
 
               def passthrough(deadline: nil, message_ordering: nil, streams: nil, inventory: nil, threads: {}, &block)
-                super.listen(deadline: deadline, message_ordering: message_ordering, streams: streams, inventory: inventory, threads: threads, &block)
+                super(deadline: deadline, message_ordering: message_ordering, streams: streams, inventory: inventory, threads: threads, &block)
               end
 
               private
