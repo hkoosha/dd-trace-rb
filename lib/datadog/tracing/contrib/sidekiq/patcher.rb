@@ -15,6 +15,8 @@ module Datadog
           end
 
           def patch
+            Datadog.logger.error 'patching sidekiq'
+
             require_relative 'client_tracer'
             require_relative 'server_tracer'
 
