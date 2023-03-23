@@ -15,15 +15,21 @@ module Datadog
           module_function
 
           def patched?
-            PATCH_ONLY_ONCE.ran?
+            v = PATCH_ONLY_ONCE.ran?
+            Datadog.logger.error("ASKING IF PATCHED: #{v}")
+            v
           end
 
           def target_version
-            Integration.version
+            v = Integration.version
+            Datadog.logger.error("ASKING VERSION: #{v}")
+            v
           end
 
           def patch
+            Datadog.logger.error('============> PATCHING')
             PATCH_ONLY_ONCE.run do
+              Datadog.logger.error('PATCHING ONCE')
               begin
                 Datadog.logger.error('Patching Pubsub publisher')
                 ::Google::Cloud::PubSub::Topic.include(Instrumentation::Publisher)

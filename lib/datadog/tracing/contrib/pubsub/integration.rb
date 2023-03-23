@@ -10,7 +10,7 @@ module Datadog
         class Integration
           include Contrib::Integration
 
-          MINIMUM_VERSION = Gem::Version.new('2.15.0')
+          MINIMUM_VERSION = Gem::Version.new('2.14.0')
 
           # @public_api Changing the integration name or integration options can cause breaking changes
           register_as :pubsub, auto_patch: true
