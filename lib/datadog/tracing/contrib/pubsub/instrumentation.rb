@@ -17,7 +17,6 @@ module Datadog
             module InstanceMethods
               def publish(data = nil, attributes = nil, ordering_key: nil, compress: nil, compression_bytes_threshold: nil,
                           **extra_attrs, &block)
-                Datadog.logger.error('PubSub publish')
                 Tracing.trace(
                   Ext::SPAN_SEND_MESSAGES,
                   service: datadog_configuration[:service_name]
@@ -31,7 +30,7 @@ module Datadog
 
               private
 
-              @@dd = ::Datadog::Tracing::Distributed::Datadog.new(fetcher: ::Datadog::Tracing::Distributed::Fetcher)
+              DD = ::Datadog::Tracing::Distributed::Datadog.new(fetcher: ::Datadog::Tracing::Distributed::Fetcher)
 
               def datadog_configuration
                 Datadog.configuration.tracing[:pubsub]
@@ -47,7 +46,7 @@ module Datadog
                 end
 
                 attributes = {} if attributes.nil?
-                @dd.inject!(::Datadog::Tracing::active_trace&.to_digest, attributes)
+                DD.inject!(::Datadog::Tracing::active_trace&.to_digest, attributes)
                 attributes
               end
             end
@@ -61,9 +60,7 @@ module Datadog
             # Instance methods for PubSub::Topic
             module InstanceMethods
               def listen(deadline: nil, message_ordering: nil, streams: nil, inventory: nil, threads: {}, &block)
-                Datadog.logger.error('PubSub listen')
                 super.listen(deadline: deadline, message_ordering: message_ordering, streams: streams, inventory: inventory, threads: threads) do |msg|
-                  Datadog.logger.error('PubSub listen block')
                   continue_trace msg
                   yield msg
                 end
@@ -71,10 +68,10 @@ module Datadog
 
               private
 
-              @@dd = ::Datadog::Tracing::Distributed::Datadog.new(fetcher: ::Datadog::Tracing::Distributed::Fetcher)
+              DD = ::Datadog::Tracing::Distributed::Datadog.new(fetcher: ::Datadog::Tracing::Distributed::Fetcher)
 
               def continue_trace(msg)
-                digest = @@dd.extract(msg.attributes)
+                digest = DD.extract(msg.attributes)
                 ::DataDog::Tracing.continue_trace!(digest)
               end
             end

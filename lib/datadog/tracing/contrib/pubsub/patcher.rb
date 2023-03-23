@@ -13,17 +13,12 @@ module Datadog
           module_function
 
           def target_version
-            v = Integration.version
-            Datadog.logger.error("ASKING VERSION: #{v}")
-            v
+            Integration.version
           end
 
           def patch
-            Datadog.logger.error('============> PATCHING')
             begin
-              Datadog.logger.error('Patching Pubsub publisher')
               ::Google::Cloud::PubSub::Topic.include(Instrumentation::Publisher)
-              Datadog.logger.error('Patching Pubsub consumer')
               ::Google::Cloud::PubSub::Subscription.include(Instrumentation::Consumer)
             rescue StandardError => e
               Datadog.logger.error("Unable to apply PubSub integration: #{e}")
