@@ -22,8 +22,6 @@ module Datadog
                   service: datadog_configuration[:service_name]
                 ) do |span|
                   attributes = decorate!(span, attributes)
-                  Datadog.logger.error "final publish attrs: #{attributes}"
-
                   super(data, attributes, ordering_key: ordering_key, compress: compress, compression_bytes_threshold: compression_bytes_threshold,
                         **extra_attrs, &block)
                 end
@@ -63,10 +61,7 @@ module Datadog
               def listen(deadline: nil, message_ordering: nil, streams: nil, inventory: nil, threads: {}, &block)
                 traced_block = proc do |msg|
                   digest = DD.extract(msg.attributes)
-                  Datadog.logger.error "final consume attrs: #{msg.attributes} :: #{digest}"
                   ::Datadog::Tracing.continue_trace!(digest) do
-                  end
-                  ::Datadog::Tracing.trace('pubsub', continue_from: digest) do
                     yield msg
                   end
                 end

@@ -18,6 +18,8 @@ module Datadog
             def trace(keywords)
               keywords[:metadata] ||= {}
 
+              puts keywords
+
               options = {
                 span_type: Tracing::Metadata::Ext::HTTP::TYPE_OUTBOUND,
                 service: service_name, # Maintain client-side service name configuration
