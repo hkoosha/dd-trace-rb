@@ -64,17 +64,14 @@ module Datadog
                 traced_block = proc do |msg|
                   digest = DD.extract(msg.attributes)
                   Datadog.logger.error "final consume attrs: #{msg.attributes} :: #{digest}"
-                  # ::Datadog::Tracing.continue_trace!(digest) do
+                  ::Datadog::Tracing.continue_trace!(digest) do
+                  end
                   ::Datadog::Tracing.trace('pubsub', continue_from: digest) do
                     yield msg
                   end
                 end
 
                 super(deadline: deadline, message_ordering: message_ordering, streams: streams, inventory: inventory, threads: threads, &traced_block)
-              end
-
-              def passthrough(deadline: nil, message_ordering: nil, streams: nil, inventory: nil, threads: {}, &block)
-                super(deadline: deadline, message_ordering: message_ordering, streams: streams, inventory: inventory, threads: threads, &block)
               end
 
               private

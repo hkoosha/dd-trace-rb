@@ -16,15 +16,21 @@ module Datadog
           register_as :pubsub
 
           def self.version
-            Gem.loaded_specs['google-cloud-pubsub'] && Gem.loaded_specs['google-cloud-pubsub'].version
+            v = Gem.loaded_specs['google-cloud-pubsub'] && Gem.loaded_specs['google-cloud-pubsub'].version
+            puts "ver = #{v}"
+            v
           end
 
           def self.loaded?
-            !defined?(::Google::Cloud::PubSub).nil?
+            v = !defined?(::Google::Cloud::PubSub).nil?
+            puts "loaded = #{v}"
+            v
           end
 
           def self.compatible?
-            super && version >= MINIMUM_VERSION
+            v = super && version >= MINIMUM_VERSION
+            puts "compatible = #{v}"
+            v
           end
 
           def new_configuration
