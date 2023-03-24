@@ -21,6 +21,7 @@ module Datadog
             resource = job_resource(job)
 
             Datadog::Tracing.trace(Ext::SPAN_PUSH, service: @sidekiq_service) do |span|
+              DD.inject!(::Datadog::Tracing.active_trace.to_digest, job)
               span.resource = resource
 
               span.set_tag(Contrib::Ext::Messaging::TAG_SYSTEM, Ext::TAG_COMPONENT)
@@ -46,6 +47,8 @@ module Datadog
           end
 
           private
+
+          DD = ::Datadog::Tracing::Distributed::Datadog.new(fetcher: ::Datadog::Tracing::Distributed::Fetcher)
 
           def configuration
             Datadog.configuration.tracing[:sidekiq]

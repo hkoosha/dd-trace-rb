@@ -26,9 +26,11 @@ module Datadog
             # DEV-2.0: Remove `tag_args`, as `quantize` can fulfill the same contract
             tag_args = worker_config(resource, :tag_args) || configuration[:tag_args]
             quantize = worker_config(resource, :quantize) || configuration[:quantize]
+            continuation = DD.extract(job)
 
             Datadog::Tracing.trace(
               Ext::SPAN_JOB,
+              continue_from: continuation,
               service: service,
               span_type: Datadog::Tracing::Metadata::Ext::AppTypes::TYPE_WORKER,
               on_error: @error_handler
@@ -71,6 +73,8 @@ module Datadog
           end
 
           private
+
+          DD = ::Datadog::Tracing::Distributed::Datadog.new(fetcher: ::Datadog::Tracing::Distributed::Fetcher)
 
           def quantize_args(quantize, args)
             quantize_options = quantize && quantize[:args]
