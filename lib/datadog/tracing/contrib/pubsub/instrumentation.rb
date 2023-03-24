@@ -47,7 +47,7 @@ module Datadog
                 end
 
                 attributes = {} if attributes.nil?
-                DD.inject!(::Datadog::Tracing::active_trace&.to_digest, attributes)
+                DD.inject!(::Datadog::Tracing.active_trace.to_digest, attributes)
                 attributes
               end
             end
@@ -64,7 +64,8 @@ module Datadog
                 traced_block = proc do |msg|
                   digest = DD.extract(msg.attributes)
                   Datadog.logger.error "final consume attrs: #{msg.attributes} :: #{digest}"
-                  ::Datadog::Tracing.continue_trace!(digest) do
+                  # ::Datadog::Tracing.continue_trace!(digest) do
+                  ::Datadog::Tracing.trace('pubsub', continue_from: digest) do
                     yield msg
                   end
                 end
