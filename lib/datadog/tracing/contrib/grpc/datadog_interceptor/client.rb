@@ -19,21 +19,20 @@ module Datadog
               # PubSub is traced by contrib::pubsub.
               if keywords[:method].start_with? '/google.pubsub.'
                 yield
-                return
-              end
+              else
+                keywords[:metadata] ||= {}
 
-              keywords[:metadata] ||= {}
+                options = {
+                  span_type: Tracing::Metadata::Ext::HTTP::TYPE_OUTBOUND,
+                  service: service_name, # Maintain client-side service name configuration
+                  resource: format_resource(keywords[:method])
+                }
 
-              options = {
-                span_type: Tracing::Metadata::Ext::HTTP::TYPE_OUTBOUND,
-                service: service_name, # Maintain client-side service name configuration
-                resource: format_resource(keywords[:method])
-              }
+                Tracing.trace(Ext::SPAN_CLIENT, **options) do |span, trace|
+                  annotate!(trace, span, keywords[:metadata], keywords[:call])
 
-              Tracing.trace(Ext::SPAN_CLIENT, **options) do |span, trace|
-                annotate!(trace, span, keywords[:metadata], keywords[:call])
-
-                yield
+                  yield
+                end
               end
             end
 
