@@ -16,9 +16,13 @@ module Datadog
           # sending the request to the server.
           class Client < Base
             def trace(keywords)
-              keywords[:metadata] ||= {}
+              # PubSub is traced by contrib::pubsub.
+              if keywords[:method].start_with? '/google.pubsub.'
+                yield
+                return
+              end
 
-              puts keywords
+              keywords[:metadata] ||= {}
 
               options = {
                 span_type: Tracing::Metadata::Ext::HTTP::TYPE_OUTBOUND,

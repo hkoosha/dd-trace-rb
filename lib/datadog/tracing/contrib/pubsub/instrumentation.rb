@@ -21,7 +21,8 @@ module Datadog
                   Ext::SPAN_SEND_MESSAGES,
                   service: datadog_configuration[:service_name]
                 ) do |span|
-                  attributes = decorate!(span, attributes)
+                  attributes ||= {}
+                  decorate!(span, attributes)
                   super(data, attributes, ordering_key: ordering_key, compress: compress, compression_bytes_threshold: compression_bytes_threshold,
                         **extra_attrs, &block)
                 end
@@ -44,9 +45,7 @@ module Datadog
                   Contrib::Analytics.set_sample_rate(span, datadog_configuration[:analytics_sample_rate])
                 end
 
-                attributes = {} if attributes.nil?
                 DD.inject!(::Datadog::Tracing.active_trace.to_digest, attributes)
-                attributes
               end
             end
           end
@@ -58,10 +57,12 @@ module Datadog
 
             # Instance methods for PubSub::Topic
             module InstanceMethods
-              def listen(deadline: nil, message_ordering: nil, streams: nil, inventory: nil, threads: {}, &block)
+              def listen(deadline: nil, message_ordering: nil, streams: nil, inventory: nil, threads: {})
                 traced_block = proc do |msg|
-                  digest = DD.extract(msg.attributes)
-                  ::Datadog::Tracing.continue_trace!(digest) do
+                  digest = DD.extract(msg.attributes || {})
+                  ::Datadog::Tracing.trace(Ext::SPAN_RECEIVE_MESSAGES, continue_from: digest) do |span_op, _|
+                    span.set_tag(Tracing::Metadata::Ext::TAG_COMPONENT, Ext::TAG_MESSAGING_SYSTEM)
+                    span_op.set_tag(Tracing::Metadata::Ext::TAG_KIND, Tracing::Metadata::Ext::SpanKind::TAG_CONSUMER)
                     yield msg
                   end
                 end
