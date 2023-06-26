@@ -52,6 +52,8 @@ module Datadog
 
           private
 
+          DD = ::Datadog::Tracing::Distributed::Datadog.new(fetcher: ::Datadog::Tracing::Distributed::Fetcher)
+
           def configuration
             Datadog.configuration.tracing[:sidekiq]
           end
